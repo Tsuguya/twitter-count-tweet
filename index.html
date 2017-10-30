@@ -34,7 +34,7 @@
 
   
   OAuth.initialize('FncuwTT_s9uQmt4dkZ44Ja3wLnY');
-  OAuth.popup('twitter').done((res) => {
+  OAuth.popup('twitter', { cache: true }).done((res) => {
     const search = (q, next_results) => {
       const d = getInputDate();
       const d2 = new Date(d);
