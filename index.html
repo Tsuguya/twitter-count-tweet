@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Twitter count tweets.</title>
+</head>
+<body>
+<div>
+    <div class="input-group">
+        <label for="date1">開始日: </label><input name="date1" id="date1" type="date">
+        <label for="time1">計測開始時間: </label>
+        <select name="time1" id="time1">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+            <option value="21">21</option>
+            <option value="22">22</option>
+            <option value="23">23</option>
+        </select>
+        <label for="time2">計測時間: </label>
+        <input name="time2" id="time2" type="number" min="1" value="1">
+        <label for="query">検索ワード</label>
+        <input name="query" id="query" type="text">
+        <button id="button">検索</button>
+    </div>
+    <div>平均一時間あたり: <span id="result">0</span></div>
+</div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.13/moment-timezone-with-data.min.js"></script>
+<script src="oauth.min.js"></script>
+<script>
+  moment.locale('ja');
+  const button = document.querySelector('#button');
+  const query = document.querySelector('#query');
+
+  let diff = 1;
+
+  const queryURL = '/1.1/search/tweets.json';
+
+  
+  OAuth.initialize('FncuwTT_s9uQmt4dkZ44Ja3wLnY');
+  OAuth.popup('twitter').done((res) => {
+    const search = (q, next_results) => {
+      const d = getInputDate();
+      const d2 = new Date(d);
+      d2.setHours(d2.getHours() + Number(document.querySelector('#time2').value));
+      const exclude = encodeURIComponent(` -from:${q} exclude:retweets`);
+      const tq = encodeURIComponent(`${q} since:`) + getDateString(d) + exclude;
+      const until = getDateString(d2);
+
+
+      diff = Math.abs(moment(d2).diff(moment(d), 'hours'));
+
+      let qs = next_results
+        ? queryURL + next_results
+        : queryURL + '?count=100&lang=ja&locale=ja&result_type=mixed&until=' + getDateString(d2) + '&q=' + tq;
+]
+      return res.get(qs).then(r => {
+        const count = r.statuses.filter(s => s.text.toLowerCase().includes(q.toLowerCase())).length;
+
+        if (r.search_metadata.next_results) {
+          return search(q, r.search_metadata.next_results)
+            .then(r2 => count + r2);
+        }
+
+        return count;
+      });
+    };
+
+    button.addEventListener('click', () => search(query.value).then(c => {
+      document.querySelector('#result').innerHTML = c / diff;
+    }));
+  })
+    .fail(e => console.log(e));
+
+  function getInputDate() {
+    const date = new Date(document.querySelector('#date1').value);
+
+    date.setHours(Number(document.querySelector('#time1').value));
+    date.setMinutes(0);
+    date.setSeconds(0);
+
+    return date;
+  }
+
+  function getDateString(date) {
+    return moment(date).tz('Asia/Tokyo').format('YYYY-MM-DD_HH:mm:ss_J\\ST');
+    // return moment(date).format('YYYY-MM-DD');
+  }
+</script>
+</html>
