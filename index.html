@@ -16,6 +16,7 @@
         <input name="query" id="query" type="text">
         <button id="button">検索</button>
     </div>
+    <div>合計: <span id="all-count"></span></div>
     <div>平均一時間あたり: <span id="result">0</span></div>
 </div>
 </body>
@@ -60,7 +61,8 @@
     };
 
     button.addEventListener('click', () => search(query.value).then(c => {
-      document.querySelector('#result').innerHTML = c / diff;
+      document.querySelector('#all-count').innerText = c;
+      document.querySelector('#result').innerText = c / diff;
     }));
   })
     .fail(e => console.log(e));
