@@ -73,7 +73,6 @@
       let qs = next_results
         ? queryURL + next_results
         : queryURL + '?count=100&lang=ja&locale=ja&result_type=mixed&until=' + getDateString(d2) + '&q=' + tq;
-]
       return res.get(qs).then(r => {
         const count = r.statuses.filter(s => s.text.toLowerCase().includes(q.toLowerCase())).length;
 
