@@ -39,7 +39,7 @@
 
   function popup() {
     button.removeEventListener('click', popup);
-    OAuth.popup('twitter', { cache: false }).done((res) => {
+    OAuth.popup('twitter', { cache: true }).done((res) => {
       const search = (q, next_results) => {
         const d = getInputDate();
         const d2 = new Date(d);
